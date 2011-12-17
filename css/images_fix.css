@@ -1,0 +1,33 @@
+img.png {
+    background-image: expression(
+        this.runtimeStyle.backgroundImage = "none",
+        this.runtimeStyle.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.src + "', sizingMethod='image')",
+        this.src = "../images/transparent.gif"
+    );
+}
+
+#kernel {
+  background: none;
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled='true', src='../images/popcorn.png', sizingMethod='scale');
+}
+
+#containerOpen {
+  background: none;
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled='true', src='../images/container.png', sizingMethod='scale');
+}
+
+#containerClose {
+  background: none;
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled='true', src='../images/container_bottom.png', sizingMethod='scale');
+}
+
+ul#mainMenu {
+  background: none;
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled='true', src='../images/main_menu_bg.png', sizingMethod='scale');
+}
+
+#footer ul#validation {
+  background: none;
+  filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled='true', src='../images/footer_clear.png', sizingMethod='scale');
+}
+
