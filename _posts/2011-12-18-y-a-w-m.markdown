@@ -1,0 +1,56 @@
+---
+layout: post
+author: corey
+title: Y.A.W.M.
+tags:
+- Technology
+- Web
+---
+Yet Another Website Migration
+=============================
+
+By my count this is the sixth incarnation of the BadPopcorn website.
+And it's sort of like Doctor Who, he's pretty much always The Doctor, but looks
+a little different, and that how this website is today.
+
+![Doctor Whos][2]
+
+The Fifth Website
+-----------------
+
+The last website version had two parts to it a Wordpress blog (from the [forth
+incarnation][1]) and a Rails app. There where some big plans for the Rails app,
+but we got distracted with trying to get our company running and it turned
+out to only generate four static pages.
+
+Then our main project [beyond the whiteboard][3] started taking off and we
+shifted from posting blogs here to [there][4]. The total number of posts
+for 2010 was only three!
+
+The Sixth Website
+-----------------
+
+A while back I read about [GitHub Pages][5] and it became clear that this
+would be a good alternative to our custom Rails app. Thus this weekend I
+set out to convert and transform our website yet again.
+
+We already had a [BadPopcorn][6] organization on GitHub, so it wasn't too
+difficult to start a repo under that for the website. And as a bonus I
+got to learn a new tool/project named [Jekyll][7].
+
+At first I thought that we would just replace the Rails app and leave
+the Wordpress install alone, but as I learned more about [Jekyll][7] it
+seemed easier to [migrate][8] the posts over as well. And that's what I did.
+
+I had to fix up a couple of things with the posts, namely some text encodings and image locations, but overall it was pretty easy conversion.
+
+**With the new website going hopefully we'll have a bit more posts in 2012 than 2011!**
+
+[1]: /blog/2005/10/05/yay-to-laziness/
+[2]: http://upload.wikimedia.org/wikipedia/en/thumb/8/80/Versions_of_the_Doctor.jpg/251px-Versions_of_the_Doctor.jpg
+[3]: http://beyondthewhiteboard.com/
+[4]: http://blog.beyondthewhiteboard.com/
+[5]: http://pages.github.com/
+[6]: https://github.com/badpopcorn/
+[7]: http://github.com/mojombo/jekyll/
+[8]: https://github.com/mojombo/jekyll/wiki/Blog-Migrations
