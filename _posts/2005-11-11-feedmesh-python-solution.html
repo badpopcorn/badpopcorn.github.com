@@ -1,0 +1,48 @@
+--- 
+layout: post
+author: byu
+title: FeedMesh Python Solution
+published: true
+meta: 
+  ljID: "41"
+tags: 
+- Python
+- Technology
+- XML
+type: post
+status: publish
+---
+<p>Ralph Meijer's blog has a <a href="http://ralphm.net/blog/2005/10/08/twisted_sprint">nice entry</a> about connecting to the FeedMesh network, even with sample code.</p>
+
+<p>This solution was exactly what I was looking for. The <a href="http://www.twistedmatrix.com/">Twisted Framework</a> is used for handling both the network connection and the XML streaming (<a href="http://twistedmatrix.com/projects/xish/">Xish package</a>).</p>
+
+<p>However, I ran into a little problem when testing the code out. I found was that the XmlStreamFactory failed to instantiate. It required another parameter in its constructor. WTF?</p>
+
+<p>Simple reason. Ralph has been making changes to remove all the Jabber specific stuff out of Xish. That parameter was for Jabber and Ralph's changes haven't made it out into a new release.</p>
+
+<p>So, for those that already have Xish 0.1.0 installed, here are the following code changes:</p>
+
+{% highlight python %}
+auth = xmlstream.Authenticator('')
+f = xmlstream.XmlStreamFactory(auth)
+{% endhighlight %}
+
+<p>Original Sample Code:</p>
+
+{% highlight python %}
+from twisted.xish import xmlstream
+from twisted.internet import reactor
+
+def onPing(element):
+    print 'Ping for %s' % (element['rss'])
+
+def connected(xs):
+    print 'Connected!'
+    xs.addObserver('/weblog', onPing)
+
+f = xmlstream.XmlStreamFactory()
+f.addBootstrap(xmlstream.STREAM_START_EVENT, connected)
+
+reactor.connectTCP('sandbox.pubsub.com', 9999, f)
+reactor.run()
+{% endhighlight %}

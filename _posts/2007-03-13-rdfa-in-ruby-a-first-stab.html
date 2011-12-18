@@ -1,0 +1,22 @@
+--- 
+layout: post
+author: byu
+title: RDFa in Ruby, a First Stab
+published: true
+meta: {}
+
+tags: 
+- Web
+type: post
+status: publish
+---
+<p>A new draft of <a href="http://www.w3.org/2006/07/SWD/RDFa/syntax/">RDFa</a> <a href="http://www.w3.org/TR/xhtml-rdfa-primer/">[1]</a> has been out for about a month now, and it got me to thinking about RDF again. This time, the geek in me saw the opportunity to use easily use RDF in my Atom based applications. Instead of using embedded micro formats in Atom Entries, I can create semantic relationship using preexisting ontologies (e.g. - DublinCore) in an easy to read format.</p>
+
+<p>The XML generation side had near zero work thanks to Ruby On Rails' rxml format. But I was lacking a parser to read in the RDF statements even though there were a <a href="http://www.google.com/search?q=ruby+rdf+store">few Ruby RDF Stores available</a>. The only RDFa parser I found was written in Python-- <a href="http://wiki.creativecommons.org/RdfaDict">rdfadict</a>.</p>
+
+<p>So, I just set aside parts of the last two days and came up with my own super simple Ruby RDFa parser; I read and reread the RDFa Syntax draft document, which is still far from complete; I skipped implementation of parts of the spec: xml:base, reification, and nested CURIEs; and got something to just work. (Note: rdfadict uses XPath for its implementation. Instead, I used an iterative approach to traverse XML documents).</p>
+
+<p>Basic parsing works; I also made it flexible enough for custom integration; I just need to spend time to write up the documentation and write up more test cases. I'll move forward with it as the RDFa spec develops and when I get feedback from anyone that uses this library.</p>
+
+<p>But for now, the code is hosted here: <a href="http://code.google.com/p/ruby-rdfa/">http://code.google.com/p/ruby-rdfa/</a>.</p>
+

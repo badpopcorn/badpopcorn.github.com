@@ -1,0 +1,25 @@
+--- 
+layout: post
+author: moe
+title: Keypress & AutoComplete in Firefox
+published: true
+meta: 
+  ljID: "241"
+tags: 
+- Life Stuff
+type: post
+status: publish
+---
+<p>If you have a javascript console open while using the firefox browser you'll notice this error from time to time.</p>
+
+{% highlight bash %}
+Error: [Exception... "'Permission denied to get property XULElement..."
+{% endhighlight %}
+
+<p>It doesn't cause any problems with the site other then the error popping up and guess what...it works fine in IE. Why? So i searched around and I think it might be an autocomplete/keypress bug in firefox. Just add the attribute "autocomplete=off" to any input that you catch keypress event on.</p>
+
+{% highlight html %}
+<input type="text" autocomplete="off" name="BadPopcornIsBetterThenYou" />
+{% endhighlight %}
+
+<p>The only reason I fixed the error was because I really like using the JavaScirpt Console in firefox. It is quite annoying when this error pops up every keypress...so like a million times. So yea, fyi for you.</p>

@@ -1,0 +1,91 @@
+--- 
+layout: post
+author: bill
+title: Authentication and Authorization in Rails
+published: true
+meta: 
+  _edit_last: "9"
+tags: 
+- Rails
+type: post
+status: publish
+---
+<p>Some say <a href="http://www.rubyonrails.com">Rails</a> is "missing" a lot of things you might expect to find in full-featured web development framework, but it doesn't matter - what's it's NOT missing is a plugin system which allows you to add any functionality you need by pulling a few bits of code from other authors into your site. What I'll be using in this example are the <a href="http://github.com/technoweenie/restful-authentication/tree/master">restful-authentication</a> plugin for authentication and the <a href="http://github.com/timcharper/role_requirement/tree/master">role_requirement</a> plugin for authorization. Both of these are hosted on <a href="http://github.com/">github</a>, which hosts loads of Rails plugins along with other open projects. As the name implies, they use git for their repositories, so you should install git to grab these plugins.</p>
+
+<p><h1>Setting up authentication</h1></p>
+
+<p>First, you'll need to set up authentication. In the vendor/plugins folder of your project, run:</p>
+
+{% highlight bash %}
+git clone git://github.com/technoweenie/restful-authentication.git restful_authentication
+{% endhighlight %}
+
+<p>This will grab a copy of the restful_authentication plugin; you don't need to mess with any of the code in the plugin itself. go back to your project's root and run:</p>
+
+{% highlight bash %}
+script/generate authenticated user sessions
+rake db:migrate
+{% endhighlight %}
+
+<p>This will set up the user model for you and insert the users table in your database. You can add arguments to the generate script such as --include-activation --aasm to enable activation emails but we're not going to cover all of that right now.</p>
+
+<p>Now, you'll have two new controllers in your application, sessions_controller.rb and users_controller.rb. Go to each of these files and remove or comment out the line that says 'include AuthenticatedSystem', and copy this line to the top of the application controller instead, right at the beginning of the class definition:
+
+{% highlight ruby %}
+class ApplicationController < ActionController::Base
+  include AuthenticatedSystem
+{% endhighlight %}
+
+<p>and so on. The generate script should have also added these lines to routes.rb:</p>
+
+{% highlight ruby %}
+  map.logout '/logout', :controller => 'sessions', :action => 'destroy'
+  map.login '/login', :controller => 'sessions', :action => 'new'
+  map.register '/register', :controller => 'users', :action => 'create'
+  map.signup '/signup', :controller => 'users', :action => 'new'
+  map.resources :users
+
+  map.resource :session
+{% endhighlight %}
+
+<p>These give you some prettier URLs rather than, for example, /users/new to sign up and /sessions/new to login. Generally you want the first thing a user sees to be the login page, so if you want to you can make that the default by adding</p>
+
+{% highlight ruby %}
+map.root :controller => "sessions", :action => "new"
+{% endhighlight %}
+
+<p>to your routes. You'll also need to remove or rename index.html in the public folder. </p>
+
+<p>At this point you have a basic authentication system, which is great considering how easy it is to set up, but alone it's pretty useless. You'll notice, no matter if you're logged in or not, you still have full access to your app. So why did we even bother? Because now, you can add authorization to lock down actions based on roles you set up.</p>
+
+<p><h1>Setting up authorization</h1></p>
+
+<p>There are a few different ways to do this; if you want a very, <b>very</b> granular authorization system you can install <a href="http://github.com/bilson/padlock_authorization/tree/master">padlock authorization</a> which allows you to set roles per each object in your application. We decided this was probably overkill for our latest project, but I may touch on it in a later blog if we decide to use it after all. We'll be using the aforementioned role_requirement plugin.</p>
+
+<p>Back to github with us! Head back to your <code>vendor/plugins</code> folder and run:</p>
+
+{% highlight bash %}
+git clone git://github.com/timcharper/role_requirement.git role_requirement
+{% endhighlight %}
+
+<p>Go back up to your application's root, and run:</p>
+
+{% highlight bash %}
+script/generate roles Role User
+rake db:migrate
+{% endhighlight %}
+
+<p>Now, you'll have to make some manual database changes. You need to add one or more roles to the roles table, and if you have any users, assign them initial roles, if you want them to have roles, in the roles_users table. You can, of course, just add a new controller and view to make all this changeable from your application, but you'll probably still be setting up one admin user by hand to start things off when you go live.</p>
+
+<p>Now you can go about editing your controllers to make each one accept and reject your roles. For example, say I have a simple model with with a TV show, which can have one starting date. To allow only administrators to make changes, you can set up your Shows controllers like so:</p>
+
+{% highlight ruby %}
+class ShowsController < ApplicationController
+  require_role "ADMIN", :for_all_except => [:index, :show]
+  def index
+    @shows = Show.find(:all)
+{% endhighlight %}
+
+<p>(The rest is standard Rails boilerplate)</p>
+
+<p>A later post will probably deal with setting/changing roles within your application.</p>

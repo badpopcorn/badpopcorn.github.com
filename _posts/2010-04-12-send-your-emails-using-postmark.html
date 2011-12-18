@@ -1,0 +1,37 @@
+--- 
+layout: post
+author: corey
+title: Send your emails using Postmark
+published: true
+meta: 
+  _edit_last: "3"
+tags: 
+- Rails
+- Technology
+- Web
+type: post
+status: publish
+---
+<img src="http://postmarkapp.com/images/landing/logo.png" style="margin-top:10px;"/>
+<br />
+<a href="http://wildbit.com/" target="_blank">Wildbit</a> recently launched a great new email delivery service named <a href="http://postmarkapp.com" target="_blank">Postmark</a>. Once I read what it was about I knew that we had to integrate in to <a title="CrossFit stats logger" href="http://beyondthewhiteboard.com" target="_blank">beyond the whiteboard</a>.
+
+<h3>First a little background.</h3>
+
+<p>Sending emails from your web application is one of those things that all the programming guides show you how to set up and get going in a few easy steps. However, they never point out the problems that you might come across while trying to send out emails.</p>
+
+<p>When launched the beta version of beyond the whiteboard we setup Gmail to be our smarthost for sending emails. That was pretty easy to get going and worked out pretty well, there where copies of the sent emails in that Gmail account and emails where sent out. However, there where a couple of things which I didn't really like. First off Gmail, replaces the from field with the user you are sending email through. For example, if your Gmail user is 'mycoolapp', that's what the from will be, even if you in your application set the from to be something else like 'support'. A minor little issue, but we wanted some emails to be from the application and others be from individuals which just wasn't possible. Lastly, Gmail limits the number of emails that you can send through it in a given period. This was the big killer for us, we hit limit and didn't know it right away. That cause us some headaches because there really wasn't a good way to know if we where close to the limit or what.</p>
+
+<p>After the few Gmail incidents I finally broke down and decided to set up an SMTP server to send out our application emails. I really didn't want to because, well email is kind of scary to me. The server configurations are very complex and they have warnings everywhere that if you make a mistake every spammer in the world will use your server. Then if that happens every ISP will hate you and little kids will point and laugh when you go to the mall. Despite all that I did manage to get a configuration going and we didn't let any evil spammers or anything bad like that. Everything appeared to be going well, or so I thought.</p>
+
+<p>You see, I setup our SMTP to only send out emails, the receiving part was still handled by Gmail. I hadn't keeping tabs on the Gmail inbox of the address we where sending from in some time. When I did happen to remember to look in that account, several months later, I discovered that EarthLink and AT&amp;T had decided that we where spammers and blocked all emails from our server. What a drag that was, I had no clue how long that had been going on, and it wasn't a very good feeling to be labeled a spammer, even if it was from an automated system. They have methods to get you removed from list and I filled out their forms, but it happened at least one other time. That's when I decided that there had to be something better out there and that's when I found <a href="http://postmarkapp.com" target="_blank">Postmark</a>.</p>
+
+<h3>Why Postmark is good.</h3>
+
+<p>Right when I read the description of the Postmark service I signed up, it was an easy decision for me. Here's how it works, you post your email to Postmark through their HTTP API and then they send your email to it's destination. See super simple, but wait there's more, they have a nice overview with a graph of how many emails you've sent, how many bounced, and how many where marked as spam. You can then dig deeper and see which emails bounced, why they bounce, and there a way to reactivate those emails if you think there was a mistake.</p>
+
+<p>The integration was also pretty easy, they have published a Ruby gem that hooks right in to ActionMailer. After a couple lines of configuration you can just use ActionMailer just like before and instead of sending emails via SMTP, they are sent to Postmark for delivery. I also really liked the way the set it up by changing ActionMailer's delivery method. Why is that good?  Well, different ActionMailer subclasses can have different delivery methods, which is completely different from the SMTP settings which are shared across all instances. That makes it possible to have emails sent to users got through Postmark, while system emails, like error reports can go through SMTP. Which is exactly how we have it set up today.</p>
+
+<p>I'm really happy with the service, now I know exactly how many emails to users we are sending out each day and how many are bouncing back. Even though Postmark just launched a few weeks ago I know that the folks at Wildbit are going to continue to make it better because <a href="http://wildbit.com/blog/2010/02/03/using-postmark-to-reveal-trends/" target="_blank">they use it</a> with their other web applications. Personally I'm really looking forward to when they get some sort of webhooks going for bounced emails. I would like to inform our users that we couldn't send them an email at the address they have given us.</p>
+
+<p>All of that totally justifies the cost of the Postmark service, which is currently $1.50 for 1,000 emails. If you are building a web application and are sending out transactional emails to your users, I would really encourage you to investigate a service like <a href="http://postmarkapp.com" target="_blank">Postmark</a>. Why worry about emails when you should be worrying about your application's main features.</p>

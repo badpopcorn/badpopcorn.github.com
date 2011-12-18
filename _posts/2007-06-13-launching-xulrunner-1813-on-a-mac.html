@@ -1,0 +1,22 @@
+--- 
+layout: post
+author: byu
+title: Launching XULRunner 1.8.1.3 on a Mac
+published: true
+meta: {}
+
+tags: 
+- OpenSource
+- Technology
+type: post
+status: publish
+---
+<p>Ok. I started playing with <a href="http://developer.mozilla.org/en/docs/XULRunner">XULRunner</a> again, but this time on my Mac. I downloaded a Mac build; I went through the <a href="http://developer.mozilla.org/en/docs/Getting_started_with_XULRunner">getting started page</a> and reviewed the <a href="http://blogs.acceleration.net/ryan/archive/2005/05/06/1073.aspx">tutorial</a>; I had my XUL application ready, and then started it up:</p>
+
+{% highlight bash %}
+/Library/Frameworks/XUL.framework/xulrunner-bin application.ini
+{% endhighlight%}
+
+<p><strong>IT FAILED, ARG!!!</strong> The xulrunner-bin process launched and promptly exited, and I couldn't find any debug information about why. I checked and double checked, but I didn't find any problems with my super simple XUL application. I even purposely broke my sample XUL application to try to get an error message-- but nothing.</p>
+
+<p><strong>SOLUTION</strong>: Out of a hunch, I followed the <a href="http://developer.mozilla.org/en/docs/XULRunner:Deploying_XULRunner_1.8">deployment instructions</a> and packaged up a "MyApp.app" Mac application. I launched it from Finder-- `open MyApp.app` also would've worked from the Terminal-- and it worked like a charm. It's kinda hackish to develop in MyApp.app/ subdirectories, but it works...</p>

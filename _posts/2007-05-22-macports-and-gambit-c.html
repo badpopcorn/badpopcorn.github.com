@@ -1,0 +1,64 @@
+--- 
+layout: post
+author: byu
+title: MacPorts and Gambit-C
+published: true
+meta: {}
+
+tags: 
+- OpenSource
+- Technology
+type: post
+status: publish
+---
+<p>The <a href="http://trac.macports.org/projects/macports/ticket/11688">Gambit-C MacPorts Portfile</a> was finally committed a couple days ago, and I just got around to trying it out. Just do a `sudo port -d selfupdate`, and `port install gambit-c`. Worked like a charm! Great Job Arto! :)</p>
+
+<p>Just a few notes about the installation for those that are trying out the examples from the Gambit-C user manual:</p>
+<ul>
+	<li>gsc needs "-l /opt/local/lib/gambit-c/_gambc" when generating link files.</li>
+	<li>Pass the following to gcc for gambit.h: -I/opt/local/include</li>
+</ul>
+
+<p>Using an example taken from the users manual:</p>
+
+<blockquote>
+  <p>Here is for example how a program with three modules (one in C and two in Scheme) can be built.  The content of the three source files (`m1.c', `m2.scm' and `m3.scm') is:</p>
+</blockquote>
+
+{% highlight c %}
+/* File: "m1.c" */
+int power_of_2 (int x) { return 1<<x; }
+{% endhighlight %}
+
+{% highlight scheme %}
+; File: "m2.scm"
+(c-declare "extern int power_of_2 ();")
+(define pow2 (c-lambda (int) int "power_of_2"))
+(define (twice x) (cons x x))
+{% endhighlight %}
+
+{% highlight scheme %}
+; File: "m3.scm"
+(write (map twice (map pow2 '(1 2 3 4)))) (newline)
+{% endhighlight %}
+
+<blockquote>
+   <p>The compilation of the two Scheme source files can be done with three invocations of `gsc':</p>
+</blockquote>
+
+{% highlight bash %}
+     $ gsc -c m2.scm        # create m2.c (note: .scm is optional)
+     $ gsc -c m3.scm        # create m3.c (note: .scm is optional)
+     $ gsc -link m2.c m3.c  # create the incremental link file m3_.c
+{% endhighlight %}
+
+<p>We, instead, use the following command lines:</p>
+{% highlight bash %}
+# optional compile into C files.
+$ gsc -c m2.scm        # create m2.c (note: .scm is optional)
+$ gsc -c m3.scm        # create m3.c (note: .scm is optional)
+# creates the link file (m3_.c) and creates m1.c m2.c if they don't exist.
+$ gsc -link -l /opt/local/lib/gambit-c/_gambc m2 m3
+# Compiles the code into a.out
+gcc -I/opt/local/include m1.c m2.c m3.c m3_.c -L/opt/local/lib/gambit-c -lgambc
+{% endhighlight %}

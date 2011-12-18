@@ -1,0 +1,27 @@
+--- 
+layout: post
+author: byu
+title: Atom Categories, Its Potential
+published: true
+meta: 
+  ljID: "234"
+tags: 
+- REST
+type: post
+status: publish
+---
+<p><em>Categories</em> were added to introspection documents in the <a href="http://bitworking.org/projects/atom/draft-ietf-atompub-protocol-10.html">Atom Publishing Protocol (Draft 10)</a>. And I think this is way cool! But wait, the <a href="http://www.ietf.org/rfc/rfc4287">Atom Syntax</a> already has categories, and bloggers already can tag (categorize) their posts with words such as <em>joke</em> or <em>serious</em>. This addition only looks like it's a way for bloggers to better organize their feeds... so what?</p>
+
+<p>Well, think about problem domains outside of blogging; let me just describe this new addition's potential with an example.</p>
+
+<p>Let's say I have an APP service for a genealogical database, called <em>PeopleSeeds</em>. And PeopleSeeds outputs Atom Feeds with machine readable genealogical data in the entries' <em>atom:content</em>. PeopleSeeds will also accept Atom entries containing the same genealogical markup for new or existing resources (Member URIs). Side note: what PeopleSeeds does afterwards with the data is up to the service-- it could do data mining, or related searching in Google for additional information.</p>
+
+<p>But the point is that PeopleSeeds can now advertise itself in introspection documents as a Genealogical Service conforming to XYZ rules; and, now, PeopleSeeds MAY formally reject entries that are not categorized as Genealogical Data-- it is implied that certain semantic rules (pieces of XML data in atom:content) are required for entries to be categorized as such. PeopleSeeds wants genealogical data, not a blog entry.</p>
+
+<p>This is a big helping hand for the world of loosely coupled auto discovered services. Various clients can now differentiate between genealogical services and blogs. One benefit could be in rich client GUIs, who can now provide customized experiences for its end users: writing blog entries, or adding ancestor data. Or it can search and use equivalent services as backup providers, or whatever.</p>
+
+<p>All this because end clients can now perform auto discovery in a uniform manner, vs haphazardly inspecting a service's feed data (or using different service discovery mechanisms) which may not reliably describe a service's capabilities.</p>
+
+<p>I say, "Wow".</p>
+
+<p>Now the Atom Publishing Protocol really is <strong>the</strong> platform for a world of loosely coupled services, not just blogs. Woot.</p>

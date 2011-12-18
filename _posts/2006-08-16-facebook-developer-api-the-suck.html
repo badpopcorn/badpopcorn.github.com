@@ -1,0 +1,50 @@
+--- 
+layout: post
+author: byu
+title: Facebook Developer API, the suck.
+published: true
+meta: 
+  _oembed_3ad8a5ec6601d7a43473aa0e90f6cbf3: "{{unknown}}"
+  _oembed_a28724b9dc7895311683570bfa44540c: "{{unknown}}"
+  _oembed_594b81786339e626ee2493a3fc76262c: "{{unknown}}"
+  _oembed_2085f6899c80221c1b88155a2f33fc30: "{{unknown}}"
+  _oembed_2b29db507b417705a4f32a1ac5c6ceb9: "{{unknown}}"
+  _oembed_847396d3f2b7a7dad803018e34132953: "{{unknown}}"
+  ljID: "208"
+  _oembed_f4e9e0b1d409fe8977c5e832fc643286: "{{unknown}}"
+  _oembed_61584df315662907ee98040d65fdaef3: "{{unknown}}"
+tags: 
+- REST
+type: post
+status: publish
+---
+<p>Moe just pointed me to <a href="http://developers.facebook.com/">Facebook's Developer API</a>. Facebook claims that its HTTP based API is RESTful... but the use of XML and HTTP (and avoidance of SOAP) does not make an API RESTful. (I sigh and laugh).</p>
+
+<p>Whatever developer team designed the Facebook Developer REST API needs to go back and reread <a href="http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">Roy Fielding's dissertation</a> and W3C's <a href="http://www.w3.org/TR/webarch/">WebArch Document</a>; they even should reread the documents they reference in their own FAQ:</p>
+
+<blockquote>What is REST?<br/>
+REST stands for Representational State Transfer. The Facebook API currently supports a REST based protocol; to learn more refer to <a href="http://en.wikipedia.org/wiki/Representational_State_Transfer">Wikipedia's definition</a>.</blockquote>
+
+<p>My Counter-claim, <strong>Facebook created an RPC server instead of a REST API</strong>.</p>
+
+<p><strong>Fact</strong>: All Facebook requests go to a single URL: http://api.facebook.com/restserver.php (except for login.php).</p>
+
+<p><strong>Comment</strong>: REST is about exposing Resources in a uniform syntax, on the web we have URIs. Meaning, we have URIs for each resource (many URIs), and can be seen with the example on the REST Wikipedia entry:</p>
+
+<blockquote>With REST, on the other hand, the emphasis is on the diversity of resources, or nouns; for example, a REST application might define the following resources<br/>
+
+http://example.com/users/<br/>
+http://example.com/users/{user} (one for each user)<br/>
+http://example.com/findUserForm<br/>
+http://example.com/locations/<br/>
+http://example.com/locations/{location} (one for each location)<br/>
+http://example.com/findLocationForm<br/>
+</blockquote>
+
+<p>Working off a single URI breaks the universal syntax and resource ideas, and Facebook commits this sin.</p>
+
+<p><strong>Fact</strong>: All Facebook actions are method based, method names are sent along to the single URI as POST parameters.</p>
+
+<p><strong>Comment</strong>: If one implements REST via HTTP/XML, then GET/POST/PUT/DELETE are the verbs one uses on given URI represented Resources. Sending method names in the request body is RPC.</p>
+
+<p>That's it, that's all that is needed to critique the unRESTfulness of Facebook's REST API. Even Wikipedia's own REST entry, itself, states that <em>Facebook's REST API</em> <strong>is not-REST</strong>.</p>

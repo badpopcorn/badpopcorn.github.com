@@ -1,0 +1,30 @@
+--- 
+layout: post
+author: byu
+title: RDFa Complexities
+published: true
+meta: {}
+
+tags: 
+- Web
+- XML
+type: post
+status: publish
+---
+<p>So I briefly read over the new draft of the <a href="http://www.w3.org/TR/xhtml-rdfa-primer/">RDFa Primer</a>. It's good overall, but Section 5 introduces unnecessary interpretation complexities.</p>
+
+<p>I say <strong>BLEAH</strong> to the Section 5. I want "Keep It Simple, Stupid." parsing. The nested layers make it harder for the parser to parse; it makes it harder for the lay person to understand RDFa (and to adopt, and to use).</p>
+
+<p>I also <strong>REALLY</strong> don't like the idea of intermixing the id and about attributes for use in defining the subjects &amp; objects. Although the primer makes a case for it, I counter with this example:</p>
+
+{% highlight xml %}
+<body about="http://example.com/mydoc#section">
+  <div id="popup">
+    The document was written by <span rel="dc:author">Tim</span>
+  <div>
+  <a onClick="...">Show PopUp</a>
+</body>
+{% endhighlight %}
+
+<p>The 'popup' id is overloaded. It's the identifier for which the Javascript code looks up, and it's also become the subject of the dc:author statement. The above fragment is also non-intuitive. I would expect &lt;http://example.com/mydoc#section&gt; dc:author 'Tim'. Instead, I get &lt;#popup&gt; dc:author 'Tim'.</p>
+

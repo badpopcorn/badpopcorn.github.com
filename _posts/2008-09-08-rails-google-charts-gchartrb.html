@@ -1,0 +1,159 @@
+--- 
+layout: post
+author: brian
+title: Google Charts in Rails, gchartrb
+published: true
+meta: 
+  _edit_last: "3"
+tags: 
+- Google
+- Rails
+- Ruby
+- Technology
+type: post
+status: publish
+---
+<p>This week I was playing around with <a href="http://code.google.com/apis/chart/">Google Charts</a>, a wonderful API for creating charts via a URL. While I developed a helper class to create charts more easily in Rails, I did a little research and realized the RubyGem <a href="http://code.google.com/p/gchartrb/">gchartrb</a> has a great API for creating these charts. Here's a quick tutorial on using gchartrb from the ground up.</p>
+
+<p><strong>Installing gchartrb</strong></p>
+
+<p>To install gchartrb, simply use the command <code>gem install gchartrb</code> from your command prompt. Check out these <a href="http://code.google.com/p/gchartrb/">instructions</a> for additional help and to access the gchartrb packages (Downloadable <a href="http://code.google.com/p/gchartrb/downloads/list">here</a>).</p>
+
+<p><strong>Quick Examples</strong></p>
+
+<p>Now that we have our gem installed, we can create graphs right away. First, remember to require the gem at the top of your code. Notice how the gchartrb gem is actually called "google_chart":</p>
+
+{% highlight ruby %}
+require 'rubygems'
+require 'google_chart'
+{% endhighlight %}
+
+<p>There are a couple ways that you can create a chart. You can instantiate the graph and then add attributes to it:</p>
+
+{% highlight ruby %}
+lc = GoogleChart::LineChart.new("400x200", "My Results", false)
+{% endhighlight %}
+
+<p>Alternatively, you can create the graph and add the attributes within a block:</p>
+
+{% highlight ruby %}
+GoogleChart::LineChart.new("400x200", "My Results", false) do |lc|
+  # Put lc data here
+  # ...
+  puts lc.to_url
+end
+{% endhighlight %}
+
+<p>I personally prefer the latter method, as the creation of the graph and its attributes are kept together in a modular fashion.</p>
+
+<p>Here are some examples of line, bar, and pie charts:</p>
+
+<p><strong>Line Chart</strong></p>
+
+{% highlight ruby %}
+lc = GoogleChart::LineChart.new("400x200", "My Results", false)
+lc.data "Line green", [3,5,1,9,0,2], '00ff00'
+lc.data "Line red", [2,4,0,6,9,3], 'ff0000'
+lc.axis :y, :range =&gt; [0,10], :font_size =&gt; 10, :alignment =&gt; :center
+lc.show_legend = false
+lc.shape_marker :circle, :color =&gt; '0000ff', :data_set_index =&gt; 0, :data_point_index =&gt; -1, :pixel_size =&gt; 10
+puts lc.to_url
+{% endhighlight %}
+
+<img src="http://chart.apis.google.com/chart?chxt=y&cht=lc&chd=s:UhG9AN,NbAo9U&chs=400x200&chxr=0,0,10&chco=00ff00,ff0000&chtt=My+Results&chxs=0,10,0&chm=o,0000ff,0,-1,10" />
+
+<p>Notice that each lc.data call will create a new data line for you. The second parameter accepts a integer or float array, which can be anything you like. Lets say you have a <code>WeighIn</code> model that has <code>weight</code> as an attribute and belongs to some <code>Person</code>. If a person weighs himself/herself once a month for a year, then we can collect that data and show your trend via a line graph. Collecting that data and using it would look like this:</p>
+
+{% highlight ruby %}
+# In the controller Person
+def show
+  @person = Person.find(params[:id])
+  weigh_ins = @person.weigh_ins.collect(&:weight)
+
+  lc = GoogleChart::LineChart.new("#{width}x200", "My Results", false)
+  lc.data "Weigh ins", weigh_ins, green
+
+  # etc, etc...
+
+  puts lc.to_url # Or @line_graph = lc.to_url
+end
+{% endhighlight %}
+
+<p>Another useful function, <code>lc.axis</code>, can be used to specify your own data range labels, but it is not required to create a chart (default ranges and labels will be used). The last function, <code>lc.to_url</code>, takes the information specified for the line chart and puts it into the Google charts url.</p>
+
+<p><strong>Bar Chart</strong></p>
+
+{% highlight ruby %}
+bar_1_data = [350,110,700]
+bar_2_data = [200,800,50]
+color_1 = 'c53711'
+color_2 = '0000ff'
+names_array = ["Bob","Stella","Foo"]
+GoogleChart::BarChart.new("600x300", "Horizontal Bar Graph", :horizontal, false) do |bc|
+  bc.data "FirstResultBar", bar_1_data, color_1
+  bc.data "SecondResultBar", bar_2_data, color_2
+  bc.axis :y, :labels =&gt; names_array, :font_size =&gt; 10
+  bc.axis :x, :range =&gt; [0,1000]
+  bc.show_legend = false
+  bc.stacked = true
+  bc.data_encoding = :extended
+  bc.shape_marker :circle, :color =&gt; '00ff00', :data_set_index =&gt; 0, :data_point_index =&gt; -1, :pixel_size =&gt; 10
+  puts bc.to_url
+end
+{% endhighlight %}
+
+<img src = "http://chart.apis.google.com/chart?chxt=y,x&chxl=0:|Bob|Stella|Foo&cht=bhg&chd=e:b.Iz3.,P...D.&chs=450x220&chxr=1,0,1000&chco=c53711,0000ff&chtt=Horizontal+Bar+Graph&chxs=0,10&chm=o,00ff00,0,-1,10"/>
+
+<p>An interesting attribute to pay attention to is <code>bc.stacked</code>, which gives you the ability to stack bar data, or to create separate bars together. When <code>bc.stacked = false</code>, the chart above is what is shown.</p>
+
+<p>If <code>bc.stacked = true</code>, the same data will look like this:</p>
+
+<img src = "http://chart.apis.google.com/chart?chxt=y,x&chxl=0:|Bob|Stella|Foo&cht=bhs&chd=e:YnHvxO,OE4QDh&chs=450x130&chxr=1,0,1000&chco=c53711,0000ff&chtt=Horizontal+Bar+Graph&chxs=0,10&chm=o,00ff00,0,-1,10"/>
+
+<p>Also, if you wanted to use this code in one of your controllers, and then display the graph in a template (view) file, you would set the graph's url in the controller: <code>@graph = bc.to_url</code> Then within the view, you can simple show the graph as an image like this: </p>
+
+{% highlight erb %}
+<!-- From within the view file --> 
+<img src="<%= @graph %>"/> 
+{% endhighlight %}
+
+<p><strong>Pie Chart</strong></p>
+ 
+{% highlight ruby %}
+GoogleChart::PieChart.new('320x200', "Pie Chart",false) do |pc| 
+  pc.data "Apples", 40 
+  pc.data "Banana", 20 
+  pc.data "Peach", 30 
+  pc.data "Orange", 60 
+  puts "\nPie Chart" 
+  puts pc.to_url 
+  # Pie Chart with no labels 
+  pc.show_labels = false 
+  puts "\nPie Chart (with no labels)" 
+  puts pc.to_url 
+end
+{% endhighlight %}
+
+<img src = "http://chart.apis.google.com/chart?chl=Apples|Banana|Peach|Orange&cht=p&chd=s:oUe9&chs=320x200&chtt=Pie+Chart"/>
+
+<img src = "http://chart.apis.google.com/chart?cht=p&chd=s:oUe9&chs=320x200&chtt=Pie+Chart"/>
+
+<p>This last example was taken from <a href="http://gchartrb.rubyforge.org/files/README_txt.html"> gchartrb's readme</a> file, which has an example for each kind of chart you can create (including Venn diagrams, Scatter charts, XY Line charts, etc). Notice that the data does not need to be within 0 to 100 (like percents on the pie chart) - the data will be added together and scaled appropriately by gchartrb. If you want to make the chart 3d, either set the 3rd parameter on <code>PieChart.new</code> to <code>true</code>, or you can set the attribute manually: <code>pc.is_3d = true</code></p>
+
+<p><strong>Useful parameters</strong></p>
+
+<p>Google charts, by default, works with the data range between 0 and 100. Most of the time, your values will not work with this same scale. Instead of converting your data to the default scale, you can specify the data range with the <code>:range</code> parameter in <a href="http://gchartrb.rubyforge.org/classes/GoogleChart/Base.html#M000017"><code>bc.axis</code></a>. So if you data was between 1 and 12 on the x_axis (like months in a year), then you could specify that range like so:</p>
+
+{% highlight ruby %}
+lc.axis :x, :range =&gt; [1,12], :labels =&gt; month_names_array
+{% endhighlight %}
+
+<p>If you're working with large data sets/numbers, then you may have chart data that is slightly off the mark. The default encoding that gchartrb uses is called <a href="http://code.google.com/apis/chart/#simple">Simple Encoding</a>, which only has 62 points of resolution. We can easily expand this resolution (to 4096 points of resolution) by using <a href="http://code.google.com/apis/chart/#extended">Extended encoding</a>, which a chart can select by changing the <code>data_encoding</code> attribute with <code>:extended</code>. For a line graph <code>lc</code>, it would look like this: <code> lc.data_encoding = :extended </code>. See <a href="http://code.google.com/apis/chart/#chart_data">Chart data</a> for an explanation for all the encodings Google charts uses.</p>
+
+<p><strong>gchartrb subtlities</strong></p>
+
+<p>While gchartrb provides a great API for create charts in Rails, there are some subtle details about gcharts that you should be aware of. First of all, all charts derive from the base class <a href="http://gchartrb.rubyforge.org/classes/GoogleChart/Base.html">GoogleChart::Base</a> - check it out to see all the methods and attributes that apply to all charts. Secondly, gchartrb encodes all of the data values in <code>some_chart.data</code> from numeric form into a string representation of the data. This conversion doesn't effect the final output of your chart, and helps make the chart url shorter in length. Again, if your working with large values, make sure the use the extended coding by using <code>lc.data_encoding :extended</code>.</p>
+
+<p><strong>Other Resources</strong></p>
+
+<p>Now that you have a taste of Google Charts with gchartrb, check out the API documentation <a href="http://gchartrb.rubyforge.org/">here</a>. If gchartrb doesn't suit your tastes, you can go directly to the <a href="http://code.google.com/apis/chart/">Google Charts API</a> - it is thorough and self-explanatory. Ajaxian shows a number of quick examples of Google Charts <a href="http://ajaxian.com/archives/use-the-google-chart-api-to-create-charts-for-your-web-applications">here</a>, and Matthew Bass gives a solid introduction to Google Charts and a few examples with gchartrb <a href="http://www.infoq.com/articles/bass-google-charts-gchartrb">here</a>. Lastly, here is a great link for <a href="http://www.collegeathome.com/blog/2008/06/05/50-cool-things-you-can-do-with-google-charts-api/">50 Cool Things You Can Do with Google Charts</a>.</p>

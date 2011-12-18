@@ -1,0 +1,63 @@
+--- 
+layout: post
+author: byu
+title: call-with-current-continuation
+published: true
+meta: {}
+
+tags: 
+- Computer Science
+type: post
+status: publish
+---
+<p>Closures get a lot of the press; so here's something that many everyday programmers don't know about.</p>
+
+<p>First off, definitions:</p>
+<ul>
+	<li>A <em>Continuation</em> is the computational state of a program (i.e. - function stack, not heap) saved into a data structure for later user.</li>
+	<li>A <em>higher order function</em> is a function that takes another function as a parameter; or it is a function that returns a function as its output; or it is both.</li>
+	<li>A <em>non-local return</em> is a way to immediately exit a function and transfer control to some point in function stack; similar to <em>goto</em>, but not quite.</li>
+</ul>
+
+<p><strong>call-with-current-continuation</strong> is a Scheme higher order function that saves the current computational state, and then executes an <em>abortable procedure</em> (a higher order function passed in as the call-with-current-continuation's sole parameter); the called abortable procedure, which has only one parameter, is given an <em>escape procedure</em>; calling the escape procedure from within the abortable procedure will execute a non-local return back to its respective call-with-current-continuation; the return value of the call-with-current-continuation is either the natural return value of the abortable procedure or a single value passed to the escape procedure; and call-with-current-continuation is also known by its shorter alias: call/cc.</p>
+
+<p>Example:</p>
+{% highlight scheme %}
+; Define some procedure I want to escape from.
+  (define my_abortable_procedure
+    (lambda (escape_procedure)
+      ; Do stuff
+      (+ 1 1)
+      ;nonlocal return
+      (escape_procedure 'SOMEVALUE)
+      (display 'NEVERREACHED_WHEN_ESCAPE_IS_CALLED)))
+
+  (display (call/cc my_abortable_procedure))
+  ; displays: SOMEVALUE
+  ; The return value of call/cc is the value either returned by my_abortable_procedure or
+  ; the value passed to escape_procedure
+{% endhighlight %}
+
+
+<p>Here's an <a href="http://community.schemewiki.org/?call-with-current-continuation">example</a> I found showing how one can jump back into a function call instead of escaping it.</p>
+
+{% highlight scheme %}
+(define return #f) 
+  
+ (+ 1 (call/cc 
+        (lambda (cont) 
+          (set! return cont) 
+          1))) 
+; The above returns 2
+
+(return 22)
+; The above returns 23
+{% endhighlight %}
+
+<p>So what's it all good for? Well, examples of use include Exceptions (e.g. - catch, throw, raise, and rescue), Co-routines, Backtracking, and Cooperative Multitasking.</p>
+
+<p>"But I don't use Scheme (or Lisp)."</p>
+
+<p>Ruby has it too <a href="http://www.rubygarden.org:3000/Ruby/page/show/Continuations">[1]</a> <a href="http://www.ruby-doc.org/core/classes/Kernel.html#M005743">[2]</a>!</p>
+
+<p>[UPDATE:12JUNE2007] - I just watched the <a href="http://http://www.iro.umontreal.ca/~boucherd/mslug/meetings/20041020/minutes-en.html">The 90 Minute Scheme to C compiler</a> talk given by Marc Feeley in 2004; part one takes an incredible 10 minute tangent into talking about call/cc (while talking about continuations in general). Definitely watch it for a great explanation.</p>

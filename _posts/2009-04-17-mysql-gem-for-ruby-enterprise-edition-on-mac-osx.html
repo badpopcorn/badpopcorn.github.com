@@ -1,0 +1,30 @@
+--- 
+layout: post
+author: byu
+title: Mysql Gem for Ruby Enterprise Edition on Mac OSX
+published: true
+meta: 
+  _edit_last: "2"
+tags: 
+- Life Stuff
+type: post
+status: publish
+---
+I just recently installed <a href="http://www.rubyenterpriseedition.com/">Ruby Enterprise Edition</a> on my Mac, but found the following errors:
+
+{% highlight bash %}
+ERROR: Error installing mysql:
+ERROR: Failed to build gem native extension
+{% endhighlight %}
+
+<p>The reason was that the Mysql files are installed under version specific directories and files when installing from Macports. For example, <code>mysql5</code> or <code>/opt/local/lib/mysql5</code>. This messes up the mysql gem installation because it looks elsewhere by default. The solution is to specify the exact mysql config location in the installation process:</p>
+
+{% highlight bash %}
+bash-3.2# /opt/ruby-enterprise-1.8.6-20090201/bin/ruby \
+  /opt/ruby-enterprise-1.8.6-20090201/bin/gem install mysql \
+  --  --with-mysql-config=/opt/local/bin/mysql_config5
+{% endhighlight %}
+
+<p>That last line is two dashes (-) followed by the <code>--with-mysql-config</code> option.</p>
+
+<p>Easy as pie.</p>

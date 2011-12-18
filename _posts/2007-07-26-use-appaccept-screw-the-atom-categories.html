@@ -1,0 +1,25 @@
+--- 
+layout: post
+author: byu
+title: Use app:accept, screw the Atom Categories
+published: true
+meta: {}
+
+tags: 
+- REST
+- Technology
+- XML
+type: post
+status: publish
+---
+<p>It's been a while since I've revisited the Atom Publishing Protocol, so I just had to review (briefly) the latest APP Draft (17) since it's probably going to be the one that becomes an RFC standard. I noticed something that I must have overlooked before: the app:accept element. Without even looking through the past drafts, I have a gut feeling that it's been in the APP for quite some time; and I have the feeling that I had a <a href="http://badpopcorn.com/2006/09/21/atom-categories-its-potential/">misguided pursuit of using Atom Categories</a> as service type descriptions.</p>
+
+<p>On the surface, one may think that the app:accept is just for giving the mime-type of whatever resource one wants to create in an APP Collection: jpeg, gif, some xml. Let's look at the "application/xml" mime-type. It describes many many XML documents that represent many resources. One may be a shopping cart order, or it may represent a classified ad. And this is why I may have overlooked the accept element before: a generic mime-type is generally too broad for describing the semantic meaning of the Resource represented using said mime-type.</p>
+
+<p>But, one can aptly describe the what "Service" a server will provide as a side effect after one POSTs a new Resource to a collection (for creation) by using the Accept Extensions as described in the APP app:accept section-- note that app:accept refers to Accept Header section (14.1) in <a href="http://www.faqs.org/rfcs/rfc2616.html">RFC2616</a>. Examples of such side effects are the creation of other Resources in other Collections by the server.</p>
+
+<p>So, in the app:accept example in the new APP Draft (17), it is implicitly suggested to use the "type" extension to describe, semantically, what a Collection will accept and process server side. Example: `application/atom+xml;type=entry` for normal atom entries. In my services now, I can add some extra domain specific restrictions on POSTed Resources with an app:accept like `application/xml;type="http://example.com/online_orders/flower_basket_order.dtd"`. But don't use DTDs, it's just an example. :) Or try `application/xml;type=com.example.some.resource.type`. Note that one has to be careful about quoting (") values. In the first case, I had the separators (as defined in RFC26162) slash (/) and colon (:) in my URI; where as the second case had no separators. And also note that what one (as a good APP citizen) POSTs Resources, not RPC requests.</p>
+
+<p>So what are Categories good for? I haven't had much time to reflect on that, so maybe it's good to use Categories if I had a generic "http://example.com/online_order.dtd" resource type that is used for all types of orders: flower baskets, bicycles, or electronics. Have a Collection for bike orders whose category may be "http://example.com/bikes", and another for Flowers...</p>
+
+<p>And all this makes sense to me because we want to be Resource Oriented, and mime-types are the preferred route in describing Resources. I say this is good stuff.</p>

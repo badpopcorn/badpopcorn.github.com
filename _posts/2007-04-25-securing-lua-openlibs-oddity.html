@@ -1,0 +1,80 @@
+--- 
+layout: post
+author: byu
+title: Securing Lua, Openlibs Oddity
+published: true
+meta: {}
+
+tags: 
+- Scripting
+- Technology
+type: post
+status: publish
+---
+<p><a href="http://www.lua.org/">Lua</a> is a very nifty scripting language embedded into many applications: World of Warcraft being my favorite. And a common way to embed Lua into a program is to open it up, load all of Lua's standard libraries and then execute the intended script:</p>
+
+{% highlight lua %}
+lua_State *l;
+l = lua_open();
+luaL_openlibs(l);
+luaL_dofile(l, "SOME_LUA_SCRIPT");
+lua_close(l);
+{% endhighlight %}
+
+<p>However, opening all the standard libraries exposes dangerous methods that can be maliciously used by a script. For example, A World of Warcraft plugin could be written to trash your entire harddrive if all of Lua's standard libraries were loaded. Instead, Lua has the ability to load its libraries individually, thus being able to exclude libraries that leave holes to the operating system:</p>
+
+{% highlight lua %}
+lua_State *l;
+l = lua_open();
+luaopen_table(l);
+luaopen_string(l);
+luaopen_math(l);
+luaL_dofile(l, "SOME_LUA_SCRIPT");
+lua_close(l);
+{% endhighlight %}
+
+<p>The above code works nicely, but I lose the Lua module functionality in the 'package' package. I wanted to allow packages to be loaded so I added a line (code for sandboxing package directories omitted):</p>
+
+{% highlight lua %}
+lua_State *l;
+l = lua_open();
+luaopen_package(l);
+luaopen_table(l);
+luaopen_string(l);
+luaopen_math(l);
+luaL_dofile(l, "SOME_LUA_SCRIPT");
+lua_close(l);
+{% endhighlight %}
+
+<p>After compiling and running, I find my code no longer works (Lua circa 5.1.2)! What's the deal? No idea, but I was able to get the 'package' package to load by creating my own clone of Lua's luaL_openlibs code. For example, the following only loads the 'package' package:</p>
+
+{% highlight lua %}
+static const luaL_Reg my_lualibs[] = {
+  // {"", luaopen_base},
+  {LUA_LOADLIBNAME, luaopen_package},
+  // {LUA_TABLIBNAME, luaopen_table},
+  // {LUA_IOLIBNAME, luaopen_io},
+  // {LUA_OSLIBNAME, luaopen_os},
+  // {LUA_STRLIBNAME, luaopen_string},
+  // {LUA_MATHLIBNAME, luaopen_math},
+  // {LUA_DBLIBNAME, luaopen_debug},
+  {NULL, NULL}
+};
+
+LUALIB_API void open_my_lualibs(lua_State *L) {
+  const luaL_Reg *lib = my_lualibs;
+  for (; lib->func; lib++) {
+    lua_pushcfunction(L, lib->func);
+    lua_pushstring(L, lib->name);
+    lua_call(L, 1, 0);
+  }
+}
+{% endhighlight %}
+
+<p>Calling open_my_lualibs instead of the usual openlibs works like a charm.</p>
+
+<p>Can anyone else reproduce this effect? Is it just me?</p>
+
+<p>P.S. - Another way to secure Lua from functions such as 'dofile'  or 'loadfile' is to nil out these unsafe functions (dofile=nil) before running a user script; but I find it a tedious task that seems to be a fragile fix.</p>
+
+<p>P.P.S. - I skipped over the lua_register(l, "function_name_in_lua", function_pointer_in_c) bits for exposing code and data to Lua scripts. A truly paranoid person would abandon the use of Lua's standard libraries and would register their own set of secured functions.</p>

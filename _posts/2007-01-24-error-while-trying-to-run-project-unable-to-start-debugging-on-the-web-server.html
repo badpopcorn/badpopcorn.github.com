@@ -1,0 +1,30 @@
+--- 
+layout: post
+author: moe
+title: "Error while trying to run project: unable to start debugging on the web server"
+published: true
+meta: {}
+
+tags: 
+- Technology
+type: post
+status: publish
+---
+<p>So im at work, you know working. I checkout a project I need to fix a bug in and make it the default web site in IIS.  I set a breakpoint and try to run the debugger.</p>
+
+{% highlight bash %}
+Error while trying to run project: unable to start debugging on the web server
+{% endhighlight %}
+
+<p>The fix wasn't too hard but it was kind of annoying.  I have two versions of .Net installed on my work computer; 2.0 and 1.1.4blah.  The default website was set as 2.0 when the project is actually 1.1.4 project.</p>
+
+<p><strong>What to do?</strong></p>
+<ol>
+	<li>Open up ISS and and right click on the website folder that host your site, in my case it was "deafult website".</li>
+	<li>Choose the ASP.Net tab.</li>
+	<li>One of the options is ASP.NET version.  Change it to the correct version.</li>
+	<li>Hit OK</li>
+	<li>It should work now.</li>
+</ol>
+
+<p><a href="http://badpopcorn.com.s3.amazonaws.com/images/2007-01-aspnet.jpg" title="Asp.net tab in ISS"><img src="http://badpopcorn.com.s3.amazonaws.com/images/2007-01-aspnet.jpg" alt="Asp.net tab in ISS" width="130" /></a></p>

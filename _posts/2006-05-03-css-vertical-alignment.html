@@ -1,0 +1,21 @@
+--- 
+layout: post
+author: moe
+title: CSS Vertical Alignment
+published: true
+meta: 
+  ljID: "127"
+tags: 
+- Life Stuff
+type: post
+status: publish
+---
+<p>I just came across something kind of dumb. If you are using a CSS stylesheet and want to change the valign of a data table you have to use "vertical-alignment" instead of "valign". Even though valign is the correct syntax for html.</p>
+
+{% highlight css %}
+td {
+  vertical-align: top;
+}
+{% endhighlight %}
+
+<p>Im sure most people might know this, but I didn't and it confused me for a good 5 minutes.</p>

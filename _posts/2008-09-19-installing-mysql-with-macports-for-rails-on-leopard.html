@@ -1,0 +1,25 @@
+--- 
+layout: post
+author: moe
+title: Installing Mysql with MacPorts for Rails on Leopard
+published: true
+meta: 
+  _edit_last: "2"
+tags: 
+- Rails
+type: post
+status: publish
+---
+<p>I just spent a hour going through this so you won't have to. I thought I installed mysql using mac ports but I kept getting this error.</p>
+
+{% highlight bash %}
+Errno::ENOENT (No such file or directory - /tmp/mysql.sock):
+{% endhighlight %}
+ 
+<p>Below are the three steps you need to get Mysql running on Leopard for MacPorts.</p> 
+
+{% highlight bash %}
+sudo port install mysql5 +server
+sudo launchctl load -w /Library/LaunchDaemons/org.macports.mysql5.plist
+sudo ln -s /opt/local/var/run/mysql5/mysqld.sock /tmp/mysql.sock
+{% endhighlight %}

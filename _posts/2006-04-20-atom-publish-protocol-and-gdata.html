@@ -1,0 +1,34 @@
+--- 
+layout: post
+author: byu
+title: Atom Publish Protocol and GData
+published: true
+meta: 
+  ljID: "123"
+tags: 
+- Google
+- REST
+type: post
+status: publish
+---
+<p>The <a href="http://code.google.com/">GData</a> protocol introduced an optimistic locking convention, for resource editing, to the <a href="http://ietfreport.isoc.org/idref/draft-ietf-atompub-protocol/">Atom Publish Protocol</a>. The introduced method is quite simple: An Atom Entry's edit URL is unique by version of the resource. Although the Google team's method just added a version number to the end of the URL, the URL itself can be random and is opaque of semantic meaning. This versioned URL method allows the server to know if a client is trying to update a resource based on stale information.</p>
+
+<p>After some pause, I had a question: Would it be better to have such versioned URLs or would it be better to add meta information in the Atom entry?</p>
+
+<p>The APP draft spec states:</p>
+
+<blockquote>8.2.1  Editing entries with foreign markup
+   To avoid unintentional loss of data when editing entry collection
+   members, Atom Protocol clients SHOULD preserve all metadata,
+   including unknown foreign markup, that has not been intentionally
+   modified.</blockquote>
+
+<p>This means that an APP client will send back the version information even if it doesn't know anything about versioning, which would allow for the server to detect version conflicts.</p>
+
+<p>However, the metadata method's one weakness is in that it only works with Atom Entries and will not work for other Media. Besides this, I have not found any compelling evidence to support one method or another when ignoring the metadata weakness. And I can't see either method breaking the REST model, so maybe it's up to the APP Service API designer.</p>
+
+<p>Then my brain took a tangent:</p>
+
+<p>Doesn't having version based edit URLs (http://example.com/pic.jpg/1/ and http://example.com/pic.jpg/2/) imply that there are two separate resources as opposed to a single resource? In general, should different versions of a resource be modeled as separated resources? Yet aren't we talking about editing a resource published at a single URL: http://example.com/pic.jpg ? If we have two separate resources, then shouldn't the published (linked to in a blog entry) URL be the latest versioned URL (http://example.com/pic.jpg/2/)? Or can we say that http://example.com/pic.jpg represents the lastest version in the 'trunk'? Or am I splitting hairs since they may just be two sides of the same coin?</p>
+
+<p>Ah that's it for thinking out loud...</p>

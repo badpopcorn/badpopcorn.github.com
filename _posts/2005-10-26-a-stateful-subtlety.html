@@ -1,0 +1,26 @@
+--- 
+layout: post
+author: byu
+title: A Stateful Subtlety
+published: true
+meta: 
+  ljID: "18"
+tags: 
+- REST
+- Technology
+type: post
+status: publish
+---
+<p>A <a href="http://www.redmountainsw.com/wordpress/archives/stateful-web-services">post</a> over at the counterpoint blog brings up Stateful Web Services.</p>
+
+<p>After reading it over a few times, I believe the post asserts that:</p>
+<ol>
+<li>SOA and Web Services lend themselves towards a course-grained API. (Which I think it means WS-*).</li>
+<li>But user interactions require repetitive low-latency fine-grained interactions.
+<i>I believe that the post suggests that the client will interact over the network to a server (Web Service) with a fine-grained API(maybe a proxy that sits in front of a course-grained Web Service).</i></li>
+<li>And finally its example of, the "Attaching documents to a webmail requires a temporary creation of a resource on the server." that can be used to achieve fine-grained access. This is used to claim: "statefulness is a necessary evil, but it is mitigated by the service providing a fool-proof interaction sequence."</li>
+</ol>
+
+<p>I am not opposed to the creation of temporary resources, nor do I have a position on fine-grained vs course-grained.</p>
+
+<p>But, let me suggest that <b>state</b> isn't something that needs to be stored and managed by the service. Rather, state is just a snapshot of the resources found on the server. A very subtle distinction. And yes, I am suggesting REST.</p>

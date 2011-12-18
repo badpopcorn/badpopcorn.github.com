@@ -1,0 +1,293 @@
+--- 
+layout: post
+author: byu
+title: How to Quickstart Merb Slice Development
+published: true
+meta: 
+  _edit_last: "2"
+  enclosure: |
+    http://merbcamp.com/video/neighman1.mp4
+    288077128
+    video/quicktime
+
+tags: 
+- Ruby
+- Technology
+- Web
+type: post
+status: publish
+---
+<p>What are Merb Slices?</p>
+
+<p>Merb Slices are a kind of mini Merb Application that can be packaged up as gems and used as is (or with customizations) within actual Merb Applications. They are full Model-View-Controller stacks to support a large feature within a larger application. Examples could be a full blogging system, user management system or a file upload system.</p>
+
+<p>Where else can I find good overview information about Merb Slices?</p>
+
+<p>There are a few places, but you should start with the <a href="http://merbcamp.com/video/neighman1.mp4">MerbCamp 2008 MerbSlices talk</a> by Daniel Neighman aka <a href="http://github.com/hassox">hassox</a>. His slides are found <a href="http://github.com/hassox/merb-camp-talks/tree/master">here</a> and <a href="http://www.slideshare.net/hassox/merb-slices-presentation">here</a>. Watch the other <a href="http://merbcamp.com/video">MerbCamp videos</a> for more Merb info.</p>
+
+<p>So what does this article cover?</p>
+
+<p>This just provides some missing details for a developer to immediately get a slice working. The above material gives a great overview of slices in general and the why/how to use/install them in main Merb applications.</p>
+
+<p>Let's start by creating our slice.</p>
+
+{% highlight bash %}
+$ merb-gen slice myslice
+Generating with slice generator:
+     [ADDED]  app/controllers/application.rb
+     [ADDED]  app/controllers/main.rb
+     [ADDED]  app/helpers/application_helper.rb
+     [ADDED]  app/views/layout/myslice.html.erb
+     [ADDED]  app/views/main/index.html.erb
+     [ADDED]  config/init.rb
+     [ADDED]  config/router.rb
+     [ADDED]  lib/myslice.rb
+     [ADDED]  Rakefile
+     [ADDED]  README
+     [ADDED]  spec/myslice_spec.rb
+     [ADDED]  spec/controllers/main_spec.rb
+     [ADDED]  spec/spec_helper.rb
+     [ADDED]  stubs/app/controllers/application.rb
+     [ADDED]  stubs/app/controllers/main.rb
+     [ADDED]  TODO
+     [ADDED]  public/javascripts/master.js
+     [ADDED]  public/stylesheets/master.css
+     [ADDED]  LICENSE
+     [ADDED]  lib/myslice/merbtasks.rb
+     [ADDED]  lib/myslice/slicetasks.rb
+     [ADDED]  lib/myslice/spectasks.rb
+$ cd myslice
+{% endhighlight %}
+
+<p>Our goal here is to set up our slice so we can actually do development without needing to install it within a Merb application, and to give an example run through of creating a resource.</p>
+
+<p>Let's start by editing the slice's <code>init.rb</code> file. This file is solely used in your slice development cycle; it is omitted from the final packaged gem; it is NOT used in production. If you look at the slice's <code>Rakefile</code>, you will see that NO file in the <code>config/</code> directory is included in the gem.</p>
+
+{% highlight bash %}
+$ vi config/init.rb
+{% endhighlight %}
+
+{% highlight ruby %}
+# Add the following to the top of the slice's config/init.rb file.
+# USE THE CORRECT GEM VERSIONS.
+merb_gems_version = "0.9.12"
+dm_gems_version   = "0.9.6"
+
+# Uncomment the following two lines to develop with haml instead of erb.
+# dependency "merb-haml", merb_gems_version
+# use_template_engine :haml
+
+dependency "dm-core", dm_gems_version
+dependency "dm-aggregates", dm_gems_version
+dependency "dm-migrations", dm_gems_version
+dependency "dm-timestamps", dm_gems_version
+dependency "dm-types", dm_gems_version
+dependency "dm-validations", dm_gems_version
+
+use_orm :datamapper
+{% endhighlight %}
+
+<p>What we did above is to declare a dependency on the DataMapper ORM. You can use whatever ORM you wish, but I'll be using DataMapper as the example in this article.</p>
+
+<p>Also, I have included commented lines to show how one would use Haml instead of Erb as the templating engine. I highly suggest that developers write views for BOTH Erb and Haml when developing slices. This gives the users of such slices a choice.</p>
+
+<p>Since we're editing files in the <code>config/</code> directory, we'll go ahead and create the <code>database.yml</code> file we'll need.</p>
+
+{% highlight bash %}
+$ vi config/database.yml
+{% endhighlight %}
+
+{% highlight yaml %}
+# This is a sample database file for the DataMapper ORM
+development: &defaults
+  # These are the settings for repository :default
+  adapter:  sqlite3
+  database: sample_development.db
+{% endhighlight %}
+
+<p>Next, we go ahead and try creating a resource as most developers will be doing. It's just the same <kbd>merb-gen</kbd> command as one would do for any regular Merb application.</p>
+
+{% highlight bash %}
+$ merb-gen resource article
+     [ADDED]  spec/models/article_spec.rb
+     [ADDED]  app/models/article.rb
+     [ADDED]  spec/requests/articles_spec.rb
+     [ADDED]  app/controllers/articles.rb
+     [ADDED]  app/views/articles/index.html.erb
+     [ADDED]  app/views/articles/show.html.erb
+     [ADDED]  app/views/articles/edit.html.erb
+     [ADDED]  app/views/articles/new.html.erb
+     [ADDED]  app/helpers/articles_helper.rb
+{% endhighlight %}
+
+<p>When we edit the articles controller, we'll see that it looks exactly like a generated resource that one would get in a Merb application. In fact that's probably the whole point since we want our slices to be full MVC stacks to implement our subsystem features. But if we tried to use this resource right now, we'll find that our slice just won't work. The main reason is how we define a slice's controller versus a controller in a full Merb application. The whole issue is about namespacing.</p>
+
+{% highlight bash %}
+$ vi app/controllers/articles.rb
+{% endhighlight %}
+
+<p>We need to change the following class declaration:</p>
+
+{% highlight ruby %}
+class Articles < Application
+{% endhighlight %}
+
+<p>to</p>
+
+{% highlight ruby %}
+class Myslice::Articles < Myslice::Application
+{% endhighlight %}
+
+<p>This article class needs to inherit from the slice's application class instead of whatever Merb app it is installed in. And the Articles class needs to be in the Myslice namespace so the slice router rules will actually be able to find the class.</p>
+
+<p>The rest of the controller looks good. It's got all the default DataMapper access code for its methods. <b>NOTE</b>: If one did not call <code>use_orm :datamapper</code> in the slice's <code>init.rb</code> file, then all this ORM access code will be omitted; one would have a plain class whose methods just called `render`.</p>
+
+<p>As a next step, one would generally verify that merb-gen would have updated the <code>config/router.rb</code> file with this new resource. <b>WARNING!</b> The <code>config/router.rb</code> file is NOT where routes are configured for slices. Everything is done in <code>lib/myslice.rb</code>, or whatever it is named in your real slice. In fact, this is also where we'll find other configuration options.</p>
+
+{% highlight bash %}
+$ vi lib/myslice.rb
+{% endhighlight %}
+
+<p>Let's go ahead and update our slice meta data. Replace the following code with your own stuff.</p>
+
+{% highlight ruby %}
+  # All Slice code is expected to be namespaced inside a module
+  module Myslice
+
+    # Slice metadata
+    self.description = "Myslice is a chunky Merb slice!"
+    self.version = "0.0.1"
+    self.author = "Engine Yard"
+{% endhighlight %}
+
+<p>I won't cover the other slice hooks in this file except for the <code>def self.setup_router(scope)</code> method. This is where you SHOULD to add your resource. Although the <code>scope.default_routes</code> line will correctly route to your resource, I find it cleaner to explicitly declare the slice's routes. Watch the video mentioned above to understand why we setup routes in this hook instead of a slice's <code>router.rb</code> file.</p>
+
+{% highlight ruby %}
+    def self.setup_router(scope)
+      # Add the following resource line
+      scope.resources :articles
+      # The lines that follow are the pre-generated ones.
+
+      scope.match('/index(.:format)').to(:controller => 'main', :action => 'index').name(:index)
+      # the slice is mounted at /myslice - note that it comes before default_routes
+      scope.match('/').to(:controller => 'main', :action => 'index').name(:home)
+      # enable slice-level default routes by default
+      scope.default_routes
+    end
+{% endhighlight %}
+
+<p>I personally would delete the <code>scope.default_routes</code> line because I'm all about explicitly specifying routes.</p>
+
+<p>At this point, we've got routes and a fixed up controller.</p>
+
+<p>Now we look at the Article model. This model contains the code required to define it as a DataMapper resource.</p>
+
+{% highlight bash %}
+$ cat app/models/article.rb
+{% endhighlight %}
+{% highlight ruby %}
+class Article
+  include DataMapper::Resource
+
+  property :id, Serial
+end
+{% endhighlight %}
+
+<p>Again, as with controllers, the DataMapper code would have been omitted without the <code>use_orm :datamapper</code> in the slice's <code>config/init.rb</code> file. We would have had an empty class.</p>
+
+<p>I will skip over how we develop Models for Datamapper in Merb. One should watch the other <a href="http://merbcamp.com/video">MerbCamp videos</a> for that. Let's just assume that you've added a few other properties to the Article model class.</p>
+
+<p>Let's create the model's sqlite3 tables.</p>
+
+{% highlight bash %}
+$ rake db:automigrate
+Don't know how to build task 'db:automigrate'
+{% endhighlight %}
+
+<p>Oops. We don't have that kind of default support in our slice's rake tasks. But no fear, we'll just invoke the auto_migrate! directly:</p>
+
+{% highlight bash %}
+$ echo 'DataMapper.auto_migrate!' | slice -i
+Loading init file from /Users/notroot/projects/myslice/config/init.rb
+ ~ Connecting to database...
+ ~ Loaded slice 'Myslice' ...
+ ~ Parent pid: 9145
+ ~ Activating slice 'Myslice' ...
+DataMapper.auto_migrate!
+[Merb::DataMapperSessionStore, Article]
+{% endhighlight %}
+
+<p>Be sure to use single quotes since the '!' character is special in bash. But if you want to do it interactively, just start up the slice irb console.</p>
+
+{% highlight bash %}
+$ slice -i
+{% endhighlight %}
+
+<p>The only other thing to note is how slice sql tables are named. Our "articles" table in the slice's development database becomes "myslice_articles" in a Merb application's database.</p>
+
+<p>And to finally get it all together, we need to start mogrel to serve up the slice... but NOT using the <code>merb</code> command. We use the <kbd>slice</kbd> binary.</p>
+
+{% highlight bash %}
+$ slice
+Loading init file from /Users/notroot/projects/myslice/config/init.rb
+ ~ Connecting to database...
+ ~ Loaded slice 'Myslice' ...
+ ~ Parent pid: 9147
+ ~ Activating slice 'Myslice' ...
+merb : worker (port 4000) ~ Starting Mongrel at port 4000
+merb : worker (port 4000) ~ Successfully bound to port 4000
+{% endhighlight %}
+
+<p>And off to the browser you go; and off to developing your slice.
+Example) <code>http://localhost:4000/articles</code></p>
+
+<p>So what's next once I finish developing my slice?</p>
+
+<p>Install your slice directly into your gem repository.</p>
+
+{% highlight bash %}
+$ sudo rake install
+{% endhighlight %}
+
+<p>Add your slice to the application's list of dependencies.</p>
+
+{% highlight bash %}
+$ cd ~/projects/myapp
+$ vi config/dependencies.rb
+{% endhighlight %}
+
+{% highlight ruby %}
+# Add your slice dependency to the bottom of the file.
+dependency "myslice", "0.0.1"
+{% endhighlight %}
+
+<p>Install the Slice into your Merb Application.</p>
+
+{% highlight bash %}
+$ rake -T slices
+$ rake slices:myslice:install
+{% endhighlight %}
+
+<p>And go ahead and add your slice to your application's <code>router.rb</code> file.</p>
+
+{% highlight bash %}
+$ vi config/router.rb
+{% endhighlight %}
+
+{% highlight ruby %}
+# Find the following method call and add your slice.
+Merb::Router.prepare do
+  # This mounts your slice to the default http://example.com/myslice/
+  # "namespace". See Merb's rubydocs for more info about options.
+  slice(:myslice)
+
+  # other stuff omitted.
+end
+{% endhighlight %}
+
+<p>Now, you can run <kbd>merb</kbd> to start up mongrel for your application and
+hit away under the <code>/myslice</code> url path namespace.</p>
+
+<p>Example) <code>http://localhost:4000/myslice/articles</code></p>
+
+<p>Go forth and slice!</p>

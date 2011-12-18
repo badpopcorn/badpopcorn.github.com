@@ -1,0 +1,57 @@
+--- 
+layout: post
+author: byu
+title: Using Yaml to stream lots of data
+published: true
+meta: 
+  _edit_last: "2"
+tags: 
+- Rails
+- Ruby
+- Technology
+- Web
+type: post
+status: publish
+---
+Most people just use <a href="http://www.yaml.org/">Yaml</a> for configuration. The prime example is the database.yml file found in almost every single <a href="http://www.rubyonrails.org/">Rails</a> app. But here's a way to take advantage of Yaml in Ruby as a way to serialize and transfer lots of  separate records from one place to another.
+
+The standard yaml library found in <a href="http://www.ruby-lang.org/">Ruby</a> is all you need. First, to serialize the target set of records. For our example, we're just going to stream to a file, but one can use any IO stream. And instead of streaming an indeterminate number of records, we're going to bound this process with a fixed number of records.
+
+{% highlight ruby %}
+require 'yaml'
+file = File.open('test.yml', 'w')
+for x in 0..100
+  hash = {
+    'id' => x,
+    'field1' => "somedata",
+    'field2' => "someother data",
+    'option' => true
+  }
+  file.write hash.to_yaml
+end
+file.close
+{% endhighlight %}
+
+Notice that all we needed to do is call the #to_yaml method to do the serialization. It also handles adds the Yaml document start character sequence automatically (i.e. "---", three dashes alone on a new line).
+
+To read that stream of data:
+
+{% highlight ruby %}
+File.open('test.yml', 'r') do |io|
+  YAML.each_document(io) do |record|
+    # Do something here
+    puts record.inspect
+  end
+end
+{% endhighlight %}
+
+Question: What's the advantage here?
+
+Answer: Constant memory footprint. We only read in as much as we need to handle the next Yaml document (object, hash). So if you're processing a 2 Gig file, the process won't try to load the entire file into memory at once. Or you may not actually know how many records will come over the wire.
+
+Some Uses:
+<ul>
+	<li>Mass dumping data from one system to another where the source system lacks write permissions, or even network access, to the target system. </li>
+	<li>Data Archival in a common format. Yaml is accessible by tools without the need for a SQL database... if one archived everything in SQL dumps. And this lets you keep rows clustered in manageable sized files.</li>
+	<li>Stream real-time updates from one system to another. Either HTTP post a batch document stream to a Webhook, or just read and write on raw TCP sockets.</li>
+</ul>

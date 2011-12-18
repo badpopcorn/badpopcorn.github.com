@@ -1,0 +1,38 @@
+--- 
+layout: post
+author: byu
+title: Django is Rails
+published: true
+meta: 
+  ljID: "57"
+tags: 
+- Python
+- Technology
+type: post
+status: publish
+---
+<p>The <a href="http://www.djangoproject.com/">Django Project</a> kicks the living crap out of <a href="http://www.turbogears.org">Turbo Gears</a> for python web application development. I went through the tutorials and documentation from both projects; messed around with writing up some toy applications. I have to say that I'd choose Django for my work.</p>
+
+<p>What does Django Project have on Turbo Gears?</p>
+
+<ul>
+<li>Django has a more cohesive and streamlined feel.</li>
+<li>I can use Django on the Dreamhost servers with less hassle. (<a href="http://wiki.dreamhost.com/index.php/Django">Installation instructions</a>)</li>
+<li>Django comes with admin interface to manage data in the database.</li>
+<li>Django comes with a prebuilt RSS and Atom feed generation application.</li>
+<li>Django provides ready to go methods for handling 80% of what you need to do (I'm talking about Generic Views).</li>
+<li>The URL composition and decoupling allows one to make applications really RESTful.</li>
+<li>Much of the work only involves wiring up the URLs and the generic views to access the data. No coding.</li>
+<li>I'm writing less code than Turbo Gears, which is almost nothing at all.</li>
+</ul>
+
+<p>But I have a few pet peeves about Django:</p>
+
+<ul>
+<li>The App's url.py file isn't truely decoupled from the project. You have to specify a view's full package and name, which the project's name is part of. But I got around that by declaring a <b>BASE_APPS_PACKAGE</b> settings.py string. Now, I can just copy apps around anywhere.</li>
+<li>I'm not sure if I like putting the URL generation logic in with the model (get_absolute_url). This can tie an app to the project. I added a <b>BASE_URLS</b> settings.py dictionary to map an application to its base url.</li>
+<li>The options on generic views don't mesh up well. I needed to write up a custom archive_index view, so it wouldn't return a 404 when no data is found. I wouldn't have needed to if the original view implemented the allow_empty parameter as found on other views.</li>
+<li>The generic views only can take custom SQL parameters if they are predefined. I had to extend my custom archive_index view to handle extra parameters taken from a URL path.</li>
+</ul>
+
+<p>I'm finding that I'm spending less time on the guts of glue work; I'm focusing on delivering the business solution; I can spend more time on the user interface.</p>

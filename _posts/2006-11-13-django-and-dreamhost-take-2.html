@@ -1,0 +1,59 @@
+--- 
+layout: post
+author: byu
+title: Django and Dreamhost, Take 2
+published: true
+meta: 
+  ljID: "253"
+tags: 
+- Python
+- Web
+type: post
+status: publish
+---
+<p>After <a href="/blog/2006/10/29/python-eggs-and-dreamhost/">installing my own custom Python build</a>, I went back and tweaked how Django ran on my Dreamhost account. My <a href="/blog/2005/11/30/django-is-rails/">previous Django installation experience</a> is still mostly valid. I just figured I could "upgrade" the installation to take advantage of Python 2.5 and eggs.</p>
+
+<p>I installed three eggs to get Django running</p>
+
+{% highlight bash %}
+# For Django
+python ez_setup.py MySQL-python
+python ez_setup.py http://www.saddi.com/software/flup/dist/flup-r2030.tar.gz
+python ez_setup.py http://www.djangoproject.com/download/0.95/tarball/
+{% endhighlight %}
+
+<p>The first was mySQL support; second was for Django's built-in <a href="http://www.djangoproject.com/documentation/fastcgi/">fcgi support</a>; and finally Django itself.</p>
+
+<p>I had a second goal in this upgrade. I wanted to partition off the "/-/" subtree (For example, http://example.com/-/admin/) for Django, instead of using the full subdomain. I had to make a couple of changes to the project's urls.py file (to handle the '-') and to the .htaccess file:</p>
+
+{% highlight python %}
+# urls.py change example for the admin application.
+(r'^-/admin/', include('django.contrib.admin.urls')),
+{% endhighlight %}
+
+<p>The .htaccess file:</p>
+{% highlight apache %}
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^-$ /-/ [R]
+RewriteRule ^-/(.*)$ /_/mysite.fcgi/-/$1 [QSA,L]
+</IfModule mod_rewrite.c>
+{% endhighlight %}
+
+<p>And finally, a new mysite.fcgi script found in the /_/ directory (notice that it's an underscore, not a dash):</p>
+
+{% highlight python %}
+#!/home/user/bin/python/bin/python
+import sys, os
+
+# Switch to the directory of your project. (Optional.)
+# os.chdir("/home/user/myproject")
+
+# Set the DJANGO_SETTINGS_MODULE environment variable.
+os.environ['DJANGO_SETTINGS_MODULE'] = "myproject.settings"
+
+from django.core.servers.fastcgi import runfastcgi
+runfastcgi(["method=threaded", "daemonize=false"])
+{% endhighlight %}

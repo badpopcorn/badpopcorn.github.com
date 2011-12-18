@@ -1,0 +1,53 @@
+--- 
+layout: post
+author: byu
+title: Coral Cache and htaccess
+published: true
+meta: 
+  ljID: "124"
+tags: 
+- Web
+type: post
+status: publish
+---
+<p>A recent digg <a href="http://digg.com/software/Digg_Defender_-_A_Plugin_for_Wordpress">post</a> showed off a WordPress plugin designed to help prevent a site's server meltdown due to traffic overload (i.e.- Digg or Slashdot effect). The plugin redirects all incoming traffic from heavy sites (e.g. - digg.com) to the protected site's equivalent <a href="http://www.coralcdn.org/">Coral Cache</a> page.</p>
+
+<p>The cool part is that someone posted a sample Apache htaccess ruleset that does the same thing. Why is this better? It's going to be way faster than using WordPress' caching system in PHP.</p>
+
+<p>My own modifications to the ruleset now:</p>
+<ol>
+<li>allows Googlebot direct access (no redirect);</li>
+<li>allows redirects from any subdomain of the high traffic sites, not just www;</li>
+<li>redirects the main page ("/") too. The ^(.*)$ seemed to not redirect the "/" pages on some apache installations. I changed it to ^(.*)?$</li>
+</ol>
+
+<p>Just copy &amp; configure the following ruleset to the top of your WordPress' .htaccess file (or the .htaccess file of any other site):</p>
+
+{% highlight apache %}
+#
+# Heavy Site Redirect to Coral Cache
+#  Links incoming from heavy sites are redirected to the Coral Cache
+#  Exception: Coral Cache Proxy Servers
+#  Exception: Googlebot crawler
+#
+#  CONFIG: Replace "example.com" with your target domain name.
+#  CONFIG: Follow the HTTP_REFERER RewriteCond examples to add or remove
+#           domains to the list of redirected sites.
+#
+<ifmodule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTP_USER_AGENT} !^Googlebot
+RewriteCond %{HTTP_USER_AGENT} !^CoralWebPrx
+RewriteCond %{QUERY_STRING} !(^|&)coral-no-serve$
+RewriteCond %{HTTP_REFERER} ^http://([^/]+\.)?digg\.com [OR]
+RewriteCond %{HTTP_REFERER} ^http://([^/]+\.)?slashdot\.org [OR]
+RewriteCond %{HTTP_REFERER} ^http://([^/]+\.)?slashdot\.com [OR]
+RewriteCond %{HTTP_REFERER} ^http://([^/]+\.)?fark\.com [OR]
+RewriteCond %{HTTP_REFERER} ^http://([^/]+\.)?somethingawful\.com [OR]
+RewriteCond %{HTTP_REFERER} ^http://([^/]+\.)?kuro5hin\.org [OR]
+RewriteCond %{HTTP_REFERER} ^http://([^/]+\.)?engadget\.com [OR]
+RewriteCond %{HTTP_REFERER} ^http://([^/]+\.)?boingboing\.net [OR]
+RewriteCond %{HTTP_REFERER} ^http://([^/]+\.)?del\.icio\.us
+RewriteRule ^(.*)?$ http://example.com.nyud.net:8080/$1 [R,L]
+</ifmodule>
+{% endhighlight %}

@@ -1,0 +1,41 @@
+--- 
+layout: post
+author: byu
+title: Python, Eggs and Dreamhost
+published: true
+meta: 
+  ljID: "246"
+tags: 
+- Python
+- Web
+type: post
+status: publish
+---
+<p>Dreamhost, my web host, does not yet support Python2.5, and one can't install Python <a href="http://peak.telecommunity.com/DevCenter/PythonEggs">eggs</a> into Dreamhost's own Python installations. The solution? I just installed a custom build of Python2.5 into my $HOME/opt directory. The following is the script I created to automate that process:</p>
+
+{% highlight bash %}
+# Obtain Python2.5 and unpack
+mkdir $HOME/downloads/
+cd $HOME/downloads/
+wget http://www.python.org/ftp/python/2.5/Python-2.5.tgz
+tar -zxvf Python-2.5.tgz
+
+# Creating the location under which python (and other apps) are to be installed.
+mkdir $HOME/opt
+
+# Go into the Python2.5 directory, make && make install the thing
+cd Python-2.5
+./configure --prefix=$HOME/opt --enable-unicode=ucs4
+make && make install
+
+# Create a bin directory for Python, and link the bin to the real executable
+mkdir -p $HOME/bin/python/bin
+ln -s $HOME/opt/bin/python $HOME/bin/python/bin/python
+{% endhighlight %}
+
+<p>After the installation, I edited the bash_profile file to add the bin path:</p>
+{% highlight bash %}
+export PATH=$HOME/bin/python/bin:$HOME/opt/bin:$PATH
+{% endhighlight %}
+
+<p>Now with a custom installation of Python, I can use eggs to manage my Django projects' library dependencies. :)</p>

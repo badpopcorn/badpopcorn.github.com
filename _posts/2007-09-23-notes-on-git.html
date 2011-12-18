@@ -1,0 +1,92 @@
+--- 
+layout: post
+author: byu
+title: Notes on Git
+published: true
+meta: {}
+
+tags: 
+- Technology
+type: post
+status: publish
+---
+<p>So, it's been a while since Linus gave a <a href="http://youtube.com/watch?v=4XpnKHJAok8">Git talk at Google</a>. Since then, I've been playing around with it. In truth, it's still a bit rough around the edges, but it is so much smoother running than darcs.</p>
+
+<p>Why? Because, it supports a distributed workflow such as:</p>
+<ol>
+	<li>Create N number of branches to work off of in your local repository.</li>
+	<li>Make N number of commits to those branches, only merging the polished patches into your own main line branch.</li>
+	<li>The expose your own main line branch to other developers via an exposed repository on some webserver somewhere.</li>
+	<li>Other developers will pull down your changes into their own repository, from which they work one the code (creating their own branches and commits).</li>
+	<li>Other developers expose their own main line branches in their own public repositories, from which you can pull down their changes.</li>
+</ol>
+
+<p>So, here are my notes about getting setting up one's own Git repositories. Note that you will generally have at least two repositories: Personal development one, and one exposed for your own published commits. In Git, the public directory is generally a "bare" repository sans a working directory. Whereas your private repository has a working directory... for your work.</p>
+
+<p>Here are steps (rough notes) for creating the public and private repository for a project:</p>
+
+{% highlight bash %}
+# -- Create your area to store the public repositories
+mkdir -p ~/repo
+
+# -- CREATE THE PROJECT
+mkdir -p ~/projects/myprojectname
+cd ~/projects/myprojectname
+git init-db
+
+# -- Commit something first, like a README.txt
+touch README.txt
+git add README.txt
+git commit -a
+
+# -- CREATE PROJECT'S PUBLIC REPOSITORY
+# NOTE: Git bombs out if there are Zero commits in the project you are
+#   making public. Make sure there's at least one commit in that repository.
+#   The reason I committed an empty README.txt. But also, one could have
+#   created a bare Git repository without the clone.
+cd ~/repo/
+
+# copy the repository in bare form-- sans working directory.
+git clone --bare ~/projects/myprojectname myprojectname.git
+
+# make the repository available for reading.
+touch myprojectname.git/git-daemon-export-ok
+cd myprojectname.git
+
+# update the server info for remote clients, tracking branches.
+git --bare update-server-info
+
+# post-update executes everytime there is a push to this public repository;
+# it executes an update-server-info by default.
+chmod a+x hooks/post-update
+
+# -- MAKE THE REPOSITORIES VISIBLE
+# NOTE: Put it on a dumb (read only) webserver of your choice.
+#   I rsync it to my dreamhost account; this command is a cron job.
+# The following makes the assumption that the public_html directory
+# is the web root for the exposed ~username/ directory for the
+# webhost.example.com webhost.
+cd ~
+rsync -av -e ssh ~/repo username@webhost.example.com:public_html/
+
+# -- UPDATE THE PUBLIC REPOSITORY
+# NOTE: This updates your local copy of the project's public repository;
+#   where the next run of the rsync cron job will update the public
+#   webserver.
+cd ~/projects/myprojectname
+git push ~/repo/myprojectname.git master:master
+
+# -- OTHERS DEVELOPERS CLONE PROJECT'S EXPOSED REPOSITORY
+# NOTE: On another machine, another developer.
+mkdir ~/projects
+cd ~/projects
+git clone http://webhost.example.com/~username/repo/myprojectname.git
+
+# This developer now has his own copy at ~/projects/myprojectname;
+# this developer will then work and create patches to send to you.
+# If you have pushed updates to your public repository, this other
+# developer may pull down your changes using:
+git pull
+{% endhighlight %}
+
+<p>Now, only if I could better figure out how I'd like to work on managing my own branches, and tracking remote branches.</p>

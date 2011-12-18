@@ -1,0 +1,40 @@
+--- 
+layout: post
+author: byu
+title: Map, Filter, and Reduce over Python Dictionaries
+published: true
+meta: 
+  ljID: "108"
+tags: 
+- Python
+type: post
+status: publish
+---
+<p>I wanted to apply some Functional Programming ideas to solve a problem in some Python code I had, which involved manipulation of data found in a couple dictionaries. Unfortunately, the built in map, filter, reduce, and list composition methods can only be used over iterable lists.</p>
+
+<p>Luckily, I remembered that equivalent dictionaries in LISP are all represented as a list-of-lists: ( (key1, val1), (key2, val2) ); python map & filter functions can then be used over this converted datastructure.</p>
+
+<p>After a little digging, I found that it's really easy to do this conversion in Python:</p>
+
+{% highlight python %}
+# Uses the list composition to make the key value pairs over a dictionary.
+dict2list = lambda dic: [(k, v) for (k, v) in dic.iteritems()]
+
+# Use the built in dictionary constructor to convert the list.
+list2dict = lambda lis: dict(lis)
+
+# Example Usage follows:
+
+dict1 = { 'a':1, 'b':2, 'c':3, 'd':4 }
+
+# Filter function
+is_even = lambda item: item[1] % 2 == 0
+# Map functions
+add_two = lambda item: (item[0], item[1] + 2)
+add_sss = lambda item: ("%s SSS" % item[0], item[1])
+# Reduce function
+add_all = lambda x, y: ("%s %s" % (x[0], y[0]), x[1] + y[1])
+
+# Make sure you have the [] around the reduce call.
+list2dict([reduce(add_all, map(add_two, map(add_sss, filter(is_even, dict2list( dict1 )))))])
+{% endhighlight %}

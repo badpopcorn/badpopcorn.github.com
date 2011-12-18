@@ -1,0 +1,30 @@
+--- 
+layout: post
+author: byu
+title: Too Many Usernames!
+published: true
+meta: 
+  ljID: "66"
+tags: 
+- Python
+- Technology
+type: post
+status: publish
+---
+<p>I am generally tolerant of dumb tech hurdles because I'm a techie, but I don't like having different usernames and passwords for every site I visit-- Yahoo, Google, MSN, etc. Some big companies are trying to solve this problem-- MSN Passport and the Liberty Alliance. But those solutions require huge budgets (and not K.I.S.S), and I personally don't think that they can realistically solve the problem.</p>
+
+<p>So, if I barely can handle this user account problem, how does a non-techie stand a chance?.</p>
+
+<p>What can be done? For my part, I'll be using <a href="http://www.openid.net/">OpenId</a> (Authentication Scheme) and <a href="http://www.yadis.org/">YADIS</a> (Scheme/Service Discovery) in my <a href="http://www.djangoproject.com/">Django</a> projects. Why?</p>
+
+<ul>
+<li>They can give my users (and me) a single identity across the web.</li>
+<li>They already have good support (LiveJournal, Moveable Type, etc).</li>
+<li>They are Simple in design.</li>
+<li>They are Open.</li>
+<li>They are Federated. Power to the people, not any one mega-corp.</li>
+</ul>
+
+<p>To do so, I wrote up a simple pluggable OpenId Authentication Django App that I can use in my projects. The app uses the OpenId Python library put out by the <a href="http://www.openidenabled.com/">OpenId Enabled</a> guys. I shot them email about contributing my code back to their project. This is in progress. If not, I'll just release and host it myself.</p>
+
+<p>Next step is to connect my OpenId App, YADIS and Django.</p>

@@ -1,0 +1,19 @@
+--- 
+layout: post
+author: byu
+title: Web Host Migration
+published: true
+meta: 
+  ljID: "100"
+tags: 
+- Life Stuff
+type: post
+status: publish
+---
+<p>Just some cryptic notes (Post-mortem) on migrating badpopcorn.com from one web host to another web host:</p>
+
+<ul>
+<li>The Wordpress Backup and Restore procedures are simple and well documented. Took 5 minutes to do.</li>
+<li>Wordpress database configuration was easy to change in wp-config.php.</li>
+<li>rsyncing from one host to another made the file copying easy. Complementary to my regular backup procedures.</li><li>Testing the new host was easy by changing my local /etc/hosts file to temporarily use the new host's servers.</li>
+<li>I was stupid to forget to test the email forwarding before changing the name servers. Failed to catch bouncing emails.</li></ul>

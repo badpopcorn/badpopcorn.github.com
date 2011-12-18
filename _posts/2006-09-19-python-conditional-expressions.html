@@ -1,0 +1,26 @@
+--- 
+layout: post
+author: byu
+title: Python Conditional Expressions
+published: true
+meta: 
+  ljID: "232"
+tags: 
+- Python
+type: post
+status: publish
+---
+<p>Python had lacked a C equivalent of the "<em>condition ? true_value : false_value</em>" expression. So we used a work around until now... conditional expressions finally made it in to Python's 2.5 release.</p>
+
+<p>In Python2.4:</p>
+{% highlight python %}
+x = ((condition) and true_value) or false_value
+{% endhighlight %}
+
+<p>In Python2.5:</p>
+{% highlight python %}
+x = true_value if condition else false_value
+{% endhighlight %}
+
+<p>Yeah, the statement looks better in Python2.5.</p>
+

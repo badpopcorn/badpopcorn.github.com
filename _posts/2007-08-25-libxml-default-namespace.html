@@ -1,0 +1,35 @@
+--- 
+layout: post
+author: moe
+title: libxml default namespace
+published: true
+meta: {}
+
+tags: 
+- Life Stuff
+type: post
+status: publish
+---
+<p>Can't find your nodes?  Neither could we.  So it turns out that Xpath doesn't behave well with default namespaces.  This is what Corey and I figured out...hope it helps.</p>
+
+<p><strong>Example XML</strong></p>
+
+{% highlight xml %}
+<Response xmlns="http://www.badpopcorn.com/solutions">
+  <solutions>
+    <solution>Don't got any</solution>
+  </solutions>
+</Response>
+{% endhighlight %}
+
+<p>Although you can load it into a document, you can't find any nodes without a little hack (using the word little loosely). Ruby example.</p>
+
+{% highlight ruby %}
+doc = XML:Document.file('http://badpopcorn.com/file.xml')
+dn = 'dn:http://www.badpopcorn.com/solutions'
+doc.find('//dn:solutions',dn).each do |node|
+  r = node.find("dn:solution",dn).first.content
+end
+{% endhighlight %}
+
+<p>Yea, we know how you feel. Way to go Corey.</p>

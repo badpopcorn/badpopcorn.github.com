@@ -1,0 +1,41 @@
+--- 
+layout: post
+author: byu
+title: Tunnel to Gmail
+published: true
+meta: 
+  ljID: "192"
+tags: 
+- Google
+- Technology
+type: post
+status: publish
+---
+<p>I am in <a href="http://en.wikipedia.org/wiki/Venice">Venezia, Italia</a> and my host has graciously let me use her computer to check email. There's only one problem... Google's services (email, reader, hosted, analytics, etc) have been unavailable to me for the past five hours. There's a problem upstream, somewhere, that prevents me from getting to GMail. A friend, in the Bay Area, tells me-- over IM chat-- that he has perfect access to GMail. All this tells me that it's just a regional access thing.</p>
+
+<p>Anyways, I really needed to check my email and couldn't wait for the problem to get resolved. So I just worked up a quick hack.</p>
+
+<p>First, I edited the laptop's hosts file (c:/windows/system32/drivers/etc/hosts) to add the following lines:</p>
+
+{% highlight bash %}
+127.0.0.1 google.com
+127.0.0.1 www.google.com
+127.0.0.1 mail.google.com
+{% endhighlight %}
+
+<p>Second, I launched the signed-jar copy of <a href="http://www.appgate.com/products/80_MindTerm/">Mindterm</a> that I have sitting on my website; I logged in to my dreamhost shell account (in the States) and set up a couple of ssh tunnels that redirected web traffic from the local loopback address to google.com:</p>
+
+{% highlight bash %}
+127.0.0.1 port 80 -> google.com port 80
+127.0.0.1 port 443 -> google.com port 443
+{% endhighlight %}
+
+<p>Finally, launched IE (she doesn't have Firefox installed) for immediate access to GMail. :)</p>
+
+<p>What did that really do?</p>
+
+<p>Normal Case: IE talks directly to GMail. IE -> GMail.</p>
+
+<p>But the Normal Case is broken.</p>
+
+<p>My Workaround: IE talks to GMail through a third party. IE -> Dreamhost Server -> GMail.</p>
