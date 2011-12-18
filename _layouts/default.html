@@ -11,6 +11,7 @@
   <!--[if lte IE 6]>
     <link href="/css/images_fix.css" media="screen" rel="stylesheet" type="text/css" />
   <![endif]-->
+  <link href="/css/pygments.css" media="screen" rel="stylesheet" type="text/css" />
   <script type="text/javascript">
     var _gaq = _gaq || [];
     _gaq.push(['_setAccount', 'UA-1838392-1']);
@@ -30,7 +31,7 @@
     <li><a href="/">Home</a></li>
     <li><a href="/about.html">About</a></li>
     <li><a href="/follow.html">Follow Us</a></li>
-    <li><a href="http://blog.badpopcorn.com">Blog</a></li>
+    <li><a href="/blog/">Blog</a></li>
   </ul>
    <div style="color:#222222;font-size:35px;padding:10px;float:left;" class="no_hover">
      <a href="/" style="color:#000000;font-size:35px;float:left;font-family:verdana;">badpopcorn</a>
@@ -39,7 +40,9 @@
    </div>
  	<div id="containerOpen"></div>
 	<div id="container">
-    {{ content }}
+    <div class="content">
+      {{ content }}
+    </div>
   </div><!--container-->
 	<div id="containerClose"></div>
 	<div id="footer">

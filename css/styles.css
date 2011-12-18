@@ -58,12 +58,6 @@ h1, h2, h3, h4, h5 {font-family: "Trebuchet MS", sans-serif;}
 	background: url('../images/container_bottom.png') 0 0 no-repeat;
 }
 
-.content {
-	width: 515px;
-	float: left;
-	display: inline;
-	overflow: hidden;
-}
 .content h1 {
 	color: #4a0015;
 	font-size: 22px;
@@ -543,17 +537,59 @@ button span {
 	color:none;
 }
 
-.follow a:hover{
+.follow a:hover {
 	color:none;
 	text-decoration:none;
 	border:none;
 }
 
-img{
+img {
 	border:none;
 }
 
-.follow_side_bar a:hover{
+.follow_side_bar a:hover {
 	border:none;
 }
+.follow_side_bar img {
+  margin: 5px 25px;
+}
 
+
+.left_column {
+ width: 515px;
+ float: left;
+}
+.right_column {
+  width: 290px;
+  float: right;
+}
+
+.post_title {
+  font-size: 25px;
+  margin-bottom: 5px;
+}
+.post_date {
+  color: #999999;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-family: verdana;
+  line-height: 20px;
+}
+.post_content {
+  border-bottom: 1px solid #ddd;
+  font-family: verdana;
+  line-height: 20px;
+  color: black;
+  font-size: 12px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+}
+.post_nav a[rel=next] {
+  float: right;
+}
+
+.highlight {
+  margin: 10px 40px;
+  padding: 0 5px;
+  background: #F8F8F8;
+}

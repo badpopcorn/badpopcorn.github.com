@@ -1,0 +1,29 @@
+---
+layout: default
+title: Blog
+---
+
+{% for post in paginator.posts %}
+  <h2 class="post_title">
+    <a rel="bookmark" href="{{ post.url }}">{{ post.title }}</a>
+  </h2>
+  <div class="post_date">
+    Written by {{ post.author }} on {{ post.date | date: "%B %e, %Y" }}
+  </div>
+  <div class="post_content">
+    {{ post.content }}
+  </div>
+{% endfor %}
+
+<div class="post_nav">
+  {% if paginator.next_page %}
+    <a rel="prev" href="/blog/page/{{ paginator.next_page }}">&laquo; Previous Entries</a>
+  {% endif %}
+  {% if paginator.previous_page %}
+    {% if paginator.previous_page == 1 %}
+      <a rel="next" href="/blog/">Next Entries &raquo;</a>
+    {% else %}
+      <a rel="next" href="/blog/page/{{ paginator.previous_page }}">Next Entries &raquo;</a>
+    {% endif %}
+  {% endif %}
+</div>
