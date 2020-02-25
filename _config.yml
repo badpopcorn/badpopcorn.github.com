@@ -1,3 +1,9 @@
 markdown: kramdown
-pygments: true
+highlighter: true
 permalink: /blog/:year/:month/:day/:title/
+url: http://badpopcorn.com
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+feed:
+  path: atom.xml
