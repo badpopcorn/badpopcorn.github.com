@@ -1,5 +1,4 @@
 markdown: kramdown
-highlighter: true
 permalink: /blog/:year/:month/:day/:title/
 url: http://badpopcorn.com
 plugins:
